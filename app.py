@@ -213,20 +213,24 @@ with col1:
                     st.error(f"Detection error: {r.status_code}")
 
         st.subheader("Manual Annotation")
-        # Convert PIL image to data URL for background
         data_url = pil_to_data_url(st.session_state.current_image_obj)
-        canvas = st_canvas(
-            drawing_mode="rect",
-            stroke_width=3,
-            stroke_color="red",
-            fill_color="rgba(255,0,0,0)",
-            background_image_url=data_url,
-            update_streamlit=True,
-            width=st.session_state.current_image_obj.width,
-            height=st.session_state.current_image_obj.height,
-            key="canvas"
-        )
-        if canvas.json_data:
+        canvas = None
+        try:
+            canvas = st_canvas(
+                drawing_mode="rect",
+                stroke_width=3,
+                stroke_color="red",
+                fill_color="rgba(255,0,0,0)",
+                background_image_url=data_url,
+                update_streamlit=True,
+                width=st.session_state.current_image_obj.width,
+                height=st.session_state.current_image_obj.height,
+                key="canvas"
+            )
+        except Exception as e:
+            st.warning(f"Could not load annotation canvas: {e}")
+
+        if canvas and hasattr(canvas, 'json_data') and canvas.json_data:
             objs = canvas.json_data.get('objects', [])
             updated = []
             for obj in objs:
