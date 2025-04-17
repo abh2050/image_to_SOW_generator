@@ -37,19 +37,13 @@ def reset_defaults():
         'current_image_obj': None,
         'current_image_name': 'N/A',
         'detect_prompt': '',
+        'uploaded_file': None,
         'image_annotation_list': [],
         'sow_text': None
     }
 for key, default in reset_defaults().items():
     if key not in st.session_state:
         st.session_state[key] = default
-
-# Helper: convert PIL image to base64 data URL for Streamlit canvas
-def pil_to_data_url(img: Image.Image) -> str:
-    buf = BytesIO()
-    img.save(buf, format="PNG")
-    b64 = base64.b64encode(buf.getvalue()).decode()
-    return f"data:image/png;base64,{b64}"
 
 # Initialize Google Generative AI
 def initialize_genai(api_key):
@@ -173,15 +167,19 @@ with col1:
     st.header("1. Image Upload & Annotation")
     uploaded = st.file_uploader("Upload an image", type=["png","jpg","jpeg"])
     if uploaded:
+        uploaded.seek(0)
         img = load_image(uploaded)
+        uploaded.seek(0)
         if img:
             st.session_state.current_image_obj = img
             st.session_state.current_image_name = uploaded.name
             st.session_state.annotations = []
+            st.session_state.uploaded_file = uploaded
 
     if st.session_state.current_image_obj:
         st.image(st.session_state.current_image_obj, caption=st.session_state.current_image_name)
-        st.text_input("Auto-detection prompt (optional)", key="detect_prompt")
+        st.text_input("Auto-detection prompt (optional)",
+                       key="detect_prompt")
         if st.button("Auto-detect Annotations"):
             if not LANDING_API_KEY:
                 st.error("LANDING_API_KEY not set.")
@@ -213,22 +211,24 @@ with col1:
                     st.error(f"Detection error: {r.status_code}")
 
         st.subheader("Manual Annotation")
-        data_url = pil_to_data_url(st.session_state.current_image_obj)
         canvas = None
-        try:
-            canvas = st_canvas(
-                drawing_mode="rect",
-                stroke_width=3,
-                stroke_color="red",
-                fill_color="rgba(255,0,0,0)",
-                background_image_url=data_url,
-                update_streamlit=True,
-                width=st.session_state.current_image_obj.width,
-                height=st.session_state.current_image_obj.height,
-                key="canvas"
-            )
-        except Exception as e:
-            st.warning(f"Could not load annotation canvas: {e}")
+        if st.session_state.uploaded_file:
+            try:
+                canvas = st_canvas(
+                    drawing_mode="rect",
+                    stroke_width=3,
+                    stroke_color="red",
+                    fill_color="rgba(255,0,0,0)",
+                    background_image_file=st.session_state.uploaded_file,
+                    update_streamlit=True,
+                    width=st.session_state.current_image_obj.width,
+                    height=st.session_state.current_image_obj.height,
+                    key="canvas"
+                )
+            except Exception as e:
+                st.warning(f"Could not load annotation canvas: {e}")
+        else:
+            st.info("Upload an image to enable manual annotation.")
 
         if canvas and hasattr(canvas, 'json_data') and canvas.json_data:
             objs = canvas.json_data.get('objects', [])
@@ -254,6 +254,7 @@ with col1:
             st.session_state.current_image_obj = None
             st.session_state.current_image_name = 'N/A'
             st.session_state.annotations = []
+            st.session_state.uploaded_file = None
             st.success("Image saved.")
 
         if st.session_state.image_annotation_list:
