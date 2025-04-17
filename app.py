@@ -1,6 +1,7 @@
 import os
 import io
 import time
+import base64
 import requests
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
@@ -28,22 +29,29 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 LANDING_API_KEY = os.getenv("LANDING_API_KEY")
 
 # Initialize session state defaults
-defaults = {
-    'annotations': [],
-    'google_api_key_configured': False,
-    'genai_model': None,
-    'current_image_obj': None,
-    'current_image_name': 'N/A',
-    'detect_prompt': '',
-    'image_annotation_list': [],
-    'sow_text': None
-}
-for key, default in defaults.items():
+def reset_defaults():
+    return {
+        'annotations': [],
+        'google_api_key_configured': False,
+        'genai_model': None,
+        'current_image_obj': None,
+        'current_image_name': 'N/A',
+        'detect_prompt': '',
+        'image_annotation_list': [],
+        'sow_text': None
+    }
+for key, default in reset_defaults().items():
     if key not in st.session_state:
         st.session_state[key] = default
 
-# Initialize Google Generative AI
+# Helper: convert PIL image to base64 data URL for Streamlit canvas
+def pil_to_data_url(img: Image.Image) -> str:
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    b64 = base64.b64encode(buf.getvalue()).decode()
+    return f"data:image/png;base64,{b64}"
 
+# Initialize Google Generative AI
 def initialize_genai(api_key):
     if not api_key:
         st.error("GOOGLE_API_KEY not found in .env file.")
@@ -56,7 +64,6 @@ def initialize_genai(api_key):
         st.error(f"Error initializing Google Generative AI: {e}")
 
 # Load uploaded image
-
 def load_image(file):
     try:
         img = Image.open(file)
@@ -66,7 +73,6 @@ def load_image(file):
         return None
 
 # Create combined prompt for multiple images
-
 def create_combined_prompt(image_list, notes):
     prompt = "Generate a detailed Scope of Work (SOW) for an industrial project based on the following images and annotations:\n\n"
     for entry in image_list:
@@ -88,7 +94,6 @@ def create_combined_prompt(image_list, notes):
     return prompt
 
 # Generate SOW text via Google AI
-
 def generate_scope_of_work(prompt):
     model = st.session_state.genai_model
     if not model:
@@ -106,7 +111,6 @@ def generate_scope_of_work(prompt):
         return ""
 
 # Generate PDF for multiple images
-
 def generate_sow_pdf_multi(sow_text, image_list):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter,
@@ -195,7 +199,7 @@ with col1:
                     h,w = st.session_state.current_image_obj.height, st.session_state.current_image_obj.width
                     anns=[]
                     for det in preds:
-                        b=det.get('bounding_box',{});
+                        b=det.get('bounding_box',{})
                         left, top = b.get('x',0)*w, b.get('y',0)*h
                         width, height = b.get('width',0)*w, b.get('height',0)*h
                         label = det.get('label','Object')
@@ -205,12 +209,14 @@ with col1:
                     st.error(f"Detection error: {r.status_code}")
 
         st.subheader("Manual Annotation")
+        # Convert PIL image to data URL for background
+        data_url = pil_to_data_url(st.session_state.current_image_obj)
         canvas = st_canvas(
             drawing_mode="rect",
             stroke_width=3,
             stroke_color="red",
             fill_color="rgba(255,0,0,0)",
-            background_image=st.session_state.current_image_obj,
+            background_image_url=data_url,
             update_streamlit=True,
             width=st.session_state.current_image_obj.width,
             height=st.session_state.current_image_obj.height,
