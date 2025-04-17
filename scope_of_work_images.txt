@@ -1,0 +1,58 @@
+**Scope of Work: Industrial Control System Replacement**
+
+**1. Project Title:** Replacement of Control System Panel at [Location to be specified based on images.jpeg]
+
+**2. Project Goal:** To replace the second from the left panel control system with a new Ellen Bradley control system, including the installation of the newest PLC panels and three switchgears.
+
+**3. Project Deliverables:**
+
+* Complete replacement of the designated control system panel.
+* Installation of a new Ellen Bradley control system.
+* Installation of the newest PLC panels (specification of PLC model to be provided separately).
+* Installation of three new switchgears (specification of switchgear model and amperage to be provided separately).
+* Functional testing of the new control system.
+
+
+**4. Detailed Tasks:**
+
+**4.1. Decommissioning of Existing System:**
+
+* **Task Description:** Safely disconnect the existing control system panel from the power supply and associated equipment.  This includes disconnecting all wiring and removing the existing panel.
+* **Safety:** Lockout/Tagout procedures must be strictly adhered to before commencing any work.  Appropriate Personal Protective Equipment (PPE), including safety glasses and gloves, must be worn.  Ensure the area is clear of obstructions.
+* **Materials:**  Tools required for disconnecting electrical wiring (e.g., screwdrivers, wire strippers).
+
+**4.2. Installation of New Ellen Bradley Control System:**
+
+* **Task Description:** Mount the new Ellen Bradley control system panel in the designated location.  Connect all necessary wiring according to the Ellen Bradley system wiring diagram.
+* **Safety:**  Follow all wiring diagrams and electrical safety codes.  Maintain proper grounding procedures. Use appropriate PPE.
+* **Materials:** New Ellen Bradley control system panel, wiring, mounting hardware.
+
+**4.3. Installation of New PLC Panels:**
+
+* **Task Description:** Install the newest PLC panels (model to be specified) into the Ellen Bradley system. Connect the PLC panels according to the manufacturer's specifications.
+* **Safety:**  Follow manufacturer's instructions for safe installation and connection. Use appropriate PPE.
+
+**4.4. Installation of New Switchgears:**
+
+* **Task Description:** Install three new switchgears (model and amperage to be specified) into the control system. Connect the switchgears according to the manufacturer's specifications and electrical schematics.
+* **Safety:**  Follow manufacturer's instructions and all relevant electrical safety codes. Use appropriate PPE.  Ensure proper grounding.
+
+**4.5. System Testing and Commissioning:**
+
+* **Task Description:** Thoroughly test the newly installed control system to ensure all components are functioning correctly.  Document the test results.
+* **Safety:** Verify all safety interlocks and emergency stop functions are operational.
+
+**5. Assumptions:**
+
+* Access to the designated area is unrestricted.
+* All necessary permits and approvals are obtained prior to commencing work.
+* Detailed wiring diagrams and manufacturer's instructions for the Ellen Bradley system, PLC panels, and switchgears will be provided.
+* Power will be disconnected during the decommissioning and installation phases.
+
+**6. Exclusions:**
+
+* This Scope of Work does not include any work beyond the specified replacement and installation tasks.
+* Any unforeseen issues or modifications requiring additional work will be addressed through a separate change order.
+
+
+This SOW is subject to change based on further assessment of the situation shown in images.jpeg, and final specifications of the replacement equipment.
