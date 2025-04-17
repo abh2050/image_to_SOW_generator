@@ -13,6 +13,7 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
 from io import BytesIO
 from streamlit_drawable_canvas import st_canvas
+import numpy as np
 import warnings
 
 # Suppress Streamlit warning: `label got an empty value.`
@@ -209,14 +210,14 @@ with col1:
                     st.error(f"Detection error: {r.status_code}")
 
         st.subheader("Manual Annotation")
-        # Convert PIL image to data URL for background
-        data_url = pil_to_data_url(st.session_state.current_image_obj)
+        # Convert PIL image to numpy array for background
+        bg_array = np.array(st.session_state.current_image_obj)
         canvas = st_canvas(
             drawing_mode="rect",
             stroke_width=3,
             stroke_color="red",
             fill_color="rgba(255,0,0,0)",
-            background_image_url=data_url,
+            background_image=bg_array,
             update_streamlit=True,
             width=st.session_state.current_image_obj.width,
             height=st.session_state.current_image_obj.height,
