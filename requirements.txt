@@ -1,0 +1,7 @@
+streamlit
+Pillow
+google-generativeai
+python-dotenv
+reportlab
+streamlit-drawable-canvas
+requests
