@@ -12,8 +12,6 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
 from io import BytesIO
-from streamlit_drawable_canvas import st_canvas
-import numpy as np
 import warnings
 
 # Suppress Streamlit warning: `label got an empty value.`
@@ -44,13 +42,6 @@ def reset_defaults():
 for key, default in reset_defaults().items():
     if key not in st.session_state:
         st.session_state[key] = default
-
-# Helper: convert PIL image to base64 data URL for Streamlit canvas
-def pil_to_data_url(img: Image.Image) -> str:
-    buf = BytesIO()
-    img.save(buf, format="PNG")
-    b64 = base64.b64encode(buf.getvalue()).decode()
-    return f"data:image/png;base64,{b64}"
 
 # Initialize Google Generative AI
 def initialize_genai(api_key):
@@ -201,69 +192,4 @@ with col1:
                     anns=[]
                     for det in preds:
                         b=det.get('bounding_box',{})
-                        left, top = b.get('x',0)*w, b.get('y',0)*h
-                        width, height = b.get('width',0)*w, b.get('height',0)*h
-                        label = det.get('label','Object')
-                        anns.append({'rect':{'left':left,'top':top,'width':width,'height':height}, 'text':label, 'id':time.time()})
-                    st.session_state.annotations = anns; st.success("Annotations updated.")
-                else:
-                    st.error(f"Detection error: {r.status_code}")
-
-        st.subheader("Manual Annotation")
-        # Convert PIL image to numpy array for background
-        bg_array = np.array(st.session_state.current_image_obj)
-        canvas = st_canvas(
-            drawing_mode="rect",
-            stroke_width=3,
-            stroke_color="red",
-            fill_color="rgba(255,0,0,0)",
-            background_image=bg_array,
-            update_streamlit=True,
-            width=st.session_state.current_image_obj.width,
-            height=st.session_state.current_image_obj.height,
-            key="canvas"
-        )
-        if canvas.json_data:
-            objs = canvas.json_data.get('objects',[])
-            updated=[]
-            for obj in objs:
-                rct={'left':obj['left'],'top':obj['top'],'width':obj['width'],'height':obj['height']}
-                ann_id=obj.get('id',time.time())
-                txt=next((a['text'] for a in st.session_state.annotations if a['id']==ann_id),'Annotation')
-                updated.append({'rect':rct,'text':txt,'id':ann_id})
-            st.session_state.annotations=updated
-
-        st.subheader("Annotation Descriptions")
-        for i,ann in enumerate(st.session_state.annotations):
-            txt=st.text_input(f"Box {i+1} description", value=ann['text'], key=f"txt_{ann['id']}")
-            st.session_state.annotations[i]['text']=txt
-
-        if st.button("Add Current Image"):
-            st.session_state.image_annotation_list.append({
-                'image':st.session_state.current_image_obj.copy(),
-                'name':st.session_state.current_image_name,
-                'annotations':list(st.session_state.annotations)
-            })
-            st.session_state.current_image_obj=None
-            st.session_state.current_image_name='N/A'
-            st.session_state.annotations=[]
-            st.success("Image saved.")
-
-        if st.session_state.image_annotation_list:
-            st.markdown("#### Saved Images")
-            for idx, e in enumerate(st.session_state.image_annotation_list):
-                st.write(f"{idx+1}. {e['name']} ({len(e['annotations'])} annotations)")
-
-with col2:
-    st.header("2. Generate SOW")
-    notes=st.text_area("Additional Notes", height=150)
-    if st.button("Show SOW"):
-        prompt=create_combined_prompt(st.session_state.image_annotation_list, notes)
-        st.session_state.sow_text=generate_scope_of_work(prompt)
-
-    if st.session_state.sow_text:
-        st.subheader("Generated Scope of Work")
-        st.text_area("", st.session_state.sow_text, height=400)
-        pdf=generate_sow_pdf_multi(st.session_state.sow_text, st.session_state.image_annotation_list)
-        st.download_button("Download SOW PDF", data=pdf, file_name="scope_of_work.pdf", mime="application/pdf")
-        st.success("SOW generated successfully.")
+                        left, top = b.get('x',0)*w, b.get('y',0)*
